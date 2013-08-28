@@ -1,0 +1,26 @@
+echo "threshold for hit lenght is: "$1
+echo "threshold for bord is: "$2
+
+if [ -z "$3" ]; then
+	id_thr=0.9
+else
+	id_thr=$3
+fi
+echo "threshold for blast identity is: "$id_thr
+echo "(default = 0.9)"
+
+out="python TAC125_homology_net_constr.py $1 $2 $id_thr"
+echo "command line used is: "
+echo $out
+out=$(python TAC125_homology_net_constr_new.py $1 $2 $id_thr)
+for x in $out
+	do
+		echo $x
+	done
+out=$x
+data=$(date)
+to_append='<!-- graph written '$data'-->'
+echo $to_append
+$to_append >> $out
+
+cp $out /home/emanueleb/Dropbox/SCAFFOLDER/Networks

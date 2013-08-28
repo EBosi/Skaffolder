@@ -1,0 +1,60 @@
+import os
+
+				
+class Draft(object):
+
+	def __init__(self,name):
+		self.name=name
+		self.contigs={}
+		self.adjacency_list={}
+
+	def add_contig(self,contig):
+		self.contigs[contig.name]=contig
+		self.adjacency_list[contig.name]={}
+
+
+class Contig(object):
+
+	def __init__(self,name,seq=''):
+		self.name=name.split()[0]
+		self.draft=self.name.split('_!')[0]
+		self.seq=seq
+
+	def coverage(self,aligned):
+		return float(aligned)/float(self.length)
+
+	@property
+	def length(self):
+		return len(self.seq)
+
+	def samedraft(self,cntg):
+		self.draft==cntg.draft
+
+
+class hit(object): 
+
+	def __init__(self,query,subj,hit):
+		self.query=query
+		self.subj=subj
+		self.hit=hit
+		self.qstart=int(hit[4])
+		self.qend=int(hit[5])
+		self.sstart=int(hit[6])
+		self.send=int(hit[7])
+		self.id=float(self.hit[0])
+		self.al_length=float(self.hit[1])
+		self.coverage= (abs(self.qstart-self.qend)+1) / self.query.length
+
+
+class parse_BLASTALL(object):
+
+	def __init__(self,blast_out):
+		self.blast_out=open(blast_out)
+	
+	def yield_hits(self):
+		for line.strip() in self.blast_out.readlines():
+			if line[0]!='#':
+				hit=line.split()
+				query,subj,hit=hit[0],hit[1],hit[2:]
+
+

@@ -1,0 +1,107 @@
+import os
+
+
+##########################################
+
+def path(path_,file_):
+	if path_[-1]!='/': path+='/'
+	return path_+file_
+
+
+def clean_folder(folder,tag='.fasta'):
+	tag_len=len(tag)
+	for i in os.listdir(folder):
+		if i[-tag_len:]!=tag: os.remove(path(folder,i))
+		
+def get_draft(folder,tag='.fasta'):
+	out=[]
+	tag_len=len(tag)
+	for i in os.listdir(folder):
+		if i[-tag_len:]==tag: out.append(i)
+	return out
+	
+
+def inp_rename(folder):
+	fastas=[file_ for file_ in os.listdir(folder) if file_[-6:]=='.fasta']
+	if len(fastas)==0: raise Exception('no fastas in %s' %folder) 
+	for i in fastas:
+		count,diz=1,{}
+		text=[]
+		for line in open(path(folder,i)).readlines():
+			line=line.strip()
+			if len(line)==0: continue
+			if line[0]=='>':
+				new_line='>%s_!contig_%s' %(i,count)
+				count+=1
+				diz[line]=new_line
+				text.append(new_line+'\n')
+			else: text.append(line+'\n')
+		conv_table=open(path(folder,i)+'_conversion_table','w')
+		out=open(path(folder,i),'w')
+		for line in text:
+			out.write(line)
+		out.close()
+		for k,v in diz.iteritems():
+			conv_table.write('%s\t%s\n' %(k,v))
+		conv_table.close()
+
+
+def instanciate_drafts(folder):
+	drafts={}
+	for draft in get_draft(folder):
+		print 'building %s' %draft
+		draft=Draft(draft,folder)
+		draft.build()
+		drafts[draft.name]=draft
+	return drafts
+
+
+##########################################
+
+
+class Draft(object):
+
+	def __init__(self,name,path_):
+		self.blast_out=''
+		self.name=name
+		print self.name
+		self.path=path_
+		self.contigs={}
+		self.adjacency_list={}
+
+	def add_contig(self,contig):
+		self.contigs[contig.name]=contig
+		self.adjacency_list[contig.name]={}
+
+	def build(self):
+		for line in open(path(self.path,self.name)).readlines():
+			line=line.strip()
+			if line[0]=='>':
+				try: self.add_contig(cont)
+				except: cont=Contig(line)
+				else: cont=Contig(line)
+			else: cont.seq+=line
+		self.add_contig(cont)
+
+
+class Contig(object):
+
+	def __init__(self,name,seq='',tag=''):
+		self.name=name.split()[0]
+		print self.name
+		self.draft=self.name.split('_!')[0]+tag
+		self.seq=seq
+
+	def coverage(self,aligned):
+		return float(aligned)/float(self.length)
+
+	@property
+	def length(self):
+		return len(self.seq)
+
+	def samedraft(self,cntg):
+		self.draft==cntg.draft
+
+
+#dir_='../../Prove/'
+#inp_rename(dir_)
