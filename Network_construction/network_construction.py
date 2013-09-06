@@ -10,7 +10,7 @@ import networkx as nx
 ##########################################
 
 
-usage="Usage: sticazzi?!?!?!?"
+usage=""
 parser=optparse.OptionParser(usage)
 parser.add_option('-i','--inp',help='give the Input Sequences folder path',dest='inp',default=None)
 parser.add_option('-o','--out',help='give the Output folder path',dest='out',default=None)
