@@ -58,7 +58,7 @@ for net in nets:
 	blast_out_parsed=Homology.Homology_parsing(nets[net].blast_out)
 	print 'constructing network...'
 	blast_out_parsed.net_construction(nets)
-print "\nBLASTing all this shit done... now starting Synteny part"
+print "\n Homology part done... now starting Synteny part"
 
 #Synteny part
 all_genes=Synteny.synteny(input_folder)
